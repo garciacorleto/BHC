@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BHC · Bombeos de Hormigón Casas</title>
+<meta name="description" content="Bombeo de hormigón para vivienda, piscinas, cimentaciones y obra en Valladolid y provincia. Presupuesto y reserva de fecha online.">
+
+<!--
+  ============================================================
+  CÓMO EDITAR ESTA WEB — LÉEME PRIMERO
+  ============================================================
+  1) Busca el bloque "CONFIG" dentro de la etiqueta <script> al
+     final del archivo. Ahí están: nombre de la empresa, teléfono,
+     email, dirección, precios y el calendario de disponibilidad.
+     Todo eso se edita sin tocar el resto del código.
+  2) Para que el formulario de CONTACTO y el de RESERVA lleguen
+     de verdad a tu email, este archivo usa un servicio gratuito
+     llamado Formspree (no necesitas programar nada):
+       a. Entra en https://formspree.io y crea una cuenta gratuita
+          con el email donde quieres recibir los mensajes.
+       b. Crea un "New Form" y copia el ID que te da
+          (algo como "xzzlqoyv").
+       c. Busca en este archivo, dos veces, el texto:
+             TU_ID_DE_FORMSPREE
+          y sustitúyelo por ese ID en las dos líneaspero pero
+          "form action=".
+     Hasta que hagas esto, los formularios no enviarán el email
+     (pero se puede editar y ver toda la web perfectamente).
+  ============================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <a href="#" class="brand">BHC</span></a>
+    <div class="nav-links" id="navLinks">
+      <a href="#servicios">Servicios</a>
+      <a href="#flota">Flota</a>
+      <a href="#precios">Precios</a>
+      <a href="#disponibilidad">Disponibilidad</a>
+      <a href="#reservar">Reservar</a>
+      <a href="#contacto">Contacto</a>
+    </div>
+    <div class="nav-cta">
+      <a class="nav-phone" href="tel:+34983000000">📞 983 00 00 00</a>
+      <a href="#reservar" class="btn btn-primary">Reservar fecha</a>
+      <button class="burger" id="burger" aria-label="Abrir menú"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Bombeo de hormigón · Valladolid y provincia</div>
+      <h1>Hormigón <em>bombeado</em> hasta donde una carretilla nunca llegaría.</h1>
+      <p class="hero-sub">Cimentaciones, soleras, forjados y piscinas para vivienda y obra en Valladolid capital y alrededores. Pides fecha, te confirmamos y llegamos con la pluma lista.</p>
+      <div class="hero-ctas">
+        <a href="#reservar" class="btn btn-primary">Reservar una fecha</a>
+        <a href="#precios" class="btn btn-ghost">Ver precios</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><b>32 m</b><span>Alcance vertical</span></div>
+        <div class="stat"><b>90 m³/h</b><span>Caudal máximo</span></div>
+        <div class="stat"><b>24–48 h</b><span>Confirmación de fecha</span></div>
+      </div>
+    </div>
+
+    <div class="boom-stage" aria-hidden="true">
+      <svg viewBox="0 0 480 360">
+        <!-- ground -->
+        <line x1="0" y1="300" x2="480" y2="300" stroke="rgba(237,234,226,0.15)" stroke-width="2"/>
+        <!-- house -->
+        <g transform="translate(340,215)">
+          <rect x="0" y="35" width="110" height="65" fill="var(--concrete-light)"/>
+          <polygon points="-6,35 55,-8 116,35" fill="var(--concrete)"/>
+          <rect x="20" y="60" width="24" height="40" fill="var(--carbon)"/>
+          <rect x="66" y="55" width="26" height="22" fill="var(--carbon)"/>
+        </g>
+        <!-- truck body -->
+        <g transform="translate(30,225)">
+          <rect x="0" y="35" width="130" height="45" rx="3" fill="var(--concrete-light)"/>
+          <rect x="0" y="10" width="46" height="35" rx="3" fill="var(--concrete)"/>
+          <circle cx="28" cy="82" r="14" fill="var(--carbon)"/>
+          <circle cx="102" cy="82" r="14" fill="var(--carbon)"/>
+          <circle cx="28" cy="82" r="5" fill="var(--steel)"/>
+          <circle cx="102" cy="82" r="5" fill="var(--steel)"/>
+        </g>
+        <!-- boom, hinged at base near truck -->
+        <g transform="translate(78,232)">
+          <g class="seg1">
+            <rect x="0" y="-6" width="110" height="12" rx="4" fill="var(--orange)"/>
+            <g transform="translate(110,0)" class="seg2">
+              <rect x="0" y="-5" width="95" height="10" rx="4" fill="var(--orange-dim)"/>
+              <g transform="translate(95,0)" class="seg3">
+                <rect x="0" y="-5" width="90" height="10" rx="4" fill="var(--orange)"/>
+                <circle class="drop" cx="90" cy="0" r="4" fill="var(--cement)"/>
+              </g>
+            </g>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section id="servicios">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Servicios</div>
+      <h2>Bombeo pensado para obra de vivienda</h2>
+      <p>Trabajamos sobre todo en construcción residencial: casas, chalets, reformas y piscinas. Cada m³ llega limpio, a caudal constante y sin ensuciar el acceso.</p>
+    </div>
+    <div class="cards3">
+      <div class="card">
+        <div class="num">01</div>
+        <h3>Cimentaciones y zapatas</h3>
+        <p>Losas de cimentación, zapatas corridas y muros de contención. Bombeo continuo para no dejar juntas frías en el vertido.</p>
+      </div>
+      <div class="card">
+        <div class="num">02</div>
+        <h3>Soleras y forjados</h3>
+        <p>Soleras de garaje, patios y forjados en planta. La pluma reparte el hormigón por toda la superficie sin mover carretillas.</p>
+      </div>
+      <div class="card">
+        <div class="num">03</div>
+        <h3>Piscinas y muros</h3>
+        <p>Vasos de piscina, muros de jardín y vallados. Alcance suficiente para llegar a patios interiores y traseras sin acceso rodado.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0;">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Cómo funciona</div>
+      <h2>De la llamada al vertido, en cuatro pasos</h2>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="process">
+      <div class="p-step">
+        <div class="n">01</div>
+        <h4>Nos cuentas la obra</h4>
+        <p>Tipo de trabajo, m³ aproximados y acceso a la vivienda, por formulario o teléfono.</p>
+      </div>
+      <div class="p-step">
+        <div class="n">02</div>
+        <h4>Te mandamos presupuesto</h4>
+        <p>Precio cerrado por m³, desplazamiento incluido, en menos de 24-48 h.</p>
+      </div>
+      <div class="p-step">
+        <div class="n">03</div>
+        <h4>Reservas la fecha</h4>
+        <p>Consultas el calendario y bloqueas el día que te interesa desde la propia web.</p>
+      </div>
+      <div class="p-step">
+        <div class="n">04</div>
+        <h4>Bombeamos el día acordado</h4>
+        <p>Llegamos con la autobomba, montamos la pluma y vertemos al ritmo que marque tu obra.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flota">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Flota</div>
+      <h2>Autobombas con pluma articulada</h2>
+      <p>Tres tamaños de equipo según el acceso y el alcance que necesite tu obra.</p>
+    </div>
+    <div class="specs-wrap">
+      <table class="specs-table">
+        <thead>
+          <tr><th>Equipo</th><th>Alcance vertical</th><th>Alcance horizontal</th><th>Caudal</th><th>Acceso mínimo</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Pluma 24</td><td>24 m</td><td>20 m</td><td>70 m³/h</td><td>3,2 m de ancho</td></tr>
+          <tr><td>Pluma 32</td><td>32 m</td><td>28 m</td><td>90 m³/h</td><td>3,5 m de ancho</td></tr>
+          <tr><td>Pluma 36</td><td>36 m</td><td>32 m</td><td>90 m³/h</td><td>4,0 m de ancho</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="precios">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Precios</div>
+      <h2>Tarifas claras, sin sorpresas el día del vertido</h2>
+      <p>Precios orientativos para obra de vivienda en Valladolid capital. El presupuesto final depende de m³, acceso y distancia.</p>
+    </div>
+    <div class="price-grid">
+      <div class="price-card">
+        <span class="tag">Pluma 24 m</span>
+        <h3>Obra pequeña</h3>
+        <div class="price-amount">9,50 €<span>/m³</span></div>
+        <ul>
+          <li>Mínimo 15 m³ por servicio</li>
+          <li>Desplazamiento incluido en capital</li>
+          <li>Ideal para soleras y piscinas</li>
+        </ul>
+        <a href="#reservar" class="btn btn-ghost btn-block">Reservar este equipo</a>
+      </div>
+      <div class="price-card featured">
+        <span class="tag">Pluma 32 m · más contratada</span>
+        <h3>Obra estándar de vivienda</h3>
+        <div class="price-amount">10,80 €<span>/m³</span></div>
+        <ul>
+          <li>Mínimo 20 m³ por servicio</li>
+          <li>Desplazamiento incluido hasta 15 km</li>
+          <li>Cimentación, forjado o solera completa</li>
+        </ul>
+        <a href="#reservar" class="btn btn-primary btn-block">Reservar este equipo</a>
+      </div>
+      <div class="price-card">
+        <span class="tag">Pluma 36 m</span>
+        <h3>Obra con acceso complicado</h3>
+        <div class="price-amount">12,20 €<span>/m³</span></div>
+        <ul>
+          <li>Mínimo 25 m³ por servicio</li>
+          <li>Mayor alcance para patios interiores</li>
+          <li>Presupuesto según distancia real</li>
+        </ul>
+        <a href="#reservar" class="btn btn-ghost btn-block">Reservar este equipo</a>
+      </div>
+    </div>
+    <p class="price-note">IVA no incluido · Hora de espera adicional: 45 €/h · Kilometraje fuera de capital: 1,10 €/km · Precios editables por el propietario en el bloque CONFIG del código.</p>
+  </div>
+</section>
+
+<section id="disponibilidad">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Disponibilidad</div>
+      <h2>Consulta el calendario antes de reservar</h2>
+      <p>Estas son las fechas con hueco para las próximas semanas. Si tu fecha aparece en verde, puedes reservarla directamente en el siguiente formulario.</p>
+    </div>
+    <div class="avail-wrap">
+      <div class="cal">
+        <div class="cal-head">
+          <h3 id="calTitle">Mes</h3>
+          <div class="cal-nav">
+            <button id="calPrev" aria-label="Mes anterior">←</button>
+            <button id="calNext" aria-label="Mes siguiente">→</button>
+          </div>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div class="cal-legend">
+          <span><i class="dot free"></i>Disponible</span>
+          <span><i class="dot tentative"></i>Consultar</span>
+          <span><i class="dot busy"></i>Ocupado</span>
+        </div>
+      </div>
+      <div class="avail-note">
+        <h4>¿No ves hueco esta semana?</h4>
+        <p>El calendario se actualiza a mano según la agenda de la autobomba. Si tu fecha ideal sale en gris, escríbenos: a veces hay margen moviendo otra obra o sumando un segundo equipo.</p>
+        <a href="#contacto" class="btn btn-ghost btn-block">Preguntar por otra fecha</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="reservar">
+  <div class="wrap">
+    <div class="form-wrap">
+      <div>
+        <div class="eyebrow">Reserva de fecha</div>
+        <h2>Bloquea tu día de bombeo</h2>
+        <p class="hero-sub">Rellena los datos de la obra. En cuanto lo recibamos, te confirmamos la fecha por teléfono o email.</p>
+
+        <!-- FORMULARIO DE RESERVA — sustituye TU_ID_DE_FORMSPREE por tu ID real -->
+        <form id="bookingForm" action="https://formspree.io/f/TU_ID_DE_FORMSPREE" method="POST">
+          <input type="hidden" name="_subject" value="Nueva reserva de bombeo — PLUMA47">
+          <div class="field-row">
+            <div class="field">
+              <label for="bkName">Nombre y apellidos</label>
+              <input id="bkName" name="Nombre" type="text" required>
+            </div>
+            <div class="field">
+              <label for="bkPhone">Teléfono</label>
+              <input id="bkPhone" name="Teléfono" type="tel" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="bkEmail">Email</label>
+            <input id="bkEmail" name="Email" type="email" required>
+          </div>
+          <div class="field">
+            <label for="bkAddress">Dirección de la obra</label>
+            <input id="bkAddress" name="Dirección de la obra" type="text" placeholder="Calle, número, localidad" required>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="bkDate">Fecha deseada</label>
+              <input id="bkDate" name="Fecha deseada" type="date" required>
+            </div>
+            <div class="field">
+              <label for="bkM3">m³ estimados</label>
+              <input id="bkM3" name="m3 estimados" type="number" min="1" placeholder="Ej. 22">
+            </div>
+          </div>
+          <div class="field">
+            <label for="bkType">Tipo de trabajo</label>
+            <select id="bkType" name="Tipo de trabajo">
+              <option>Cimentación / zapatas</option>
+              <option>Solera</option>
+              <option>Forjado</option>
+              <option>Piscina</option>
+              <option>Muro</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="bkMsg">Notas sobre el acceso (opcional)</label>
+            <textarea id="bkMsg" name="Notas" placeholder="Ancho de calle, obstáculos, cables aéreos..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Enviar reserva</button>
+          <p class="form-note">Esto es una solicitud de reserva, no una confirmación definitiva: te contactamos para cerrar la fecha.</p>
+        </form>
+      </div>
+
+      <div class="side-info">
+        <h3>Antes de reservar</h3>
+        <div class="info-line">
+          <div class="icon">①</div>
+          <div><b>Revisa el acceso</b><span>La calle debe permitir el paso de un camión de más de 3 m de ancho hasta cerca de la obra.</span></div>
+        </div>
+        <div class="info-line">
+          <div class="icon">②</div>
+          <div><b>Ten el hormigón contratado</b><span>Nosotros bombeamos; si aún no tienes central de hormigón, podemos recomendarte una en Valladolid.</span></div>
+        </div>
+        <div class="info-line">
+          <div class="icon">③</div>
+          <div><b>Confirmación en 24–48 h</b><span>Te llamamos para cerrar hora exacta y comprobar el acceso con foto o dirección.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contacto">
+  <div class="wrap">
+    <div class="form-wrap">
+      <div>
+        <div class="eyebrow">Contacto</div>
+        <h2>¿Dudas antes de pedir presupuesto?</h2>
+        <p class="hero-sub">Escríbenos y te respondemos nosotros mismos, sin intermediarios.</p>
+
+        <!-- FORMULARIO DE CONTACTO — sustituye TU_ID_DE_FORMSPREE por tu ID real -->
+        <form id="contactForm" action="https://formspree.io/f/TU_ID_DE_FORMSPREE" method="POST">
+          <input type="hidden" name="_subject" value="Nuevo mensaje de contacto — PLUMA47">
+          <div class="field-row">
+            <div class="field">
+              <label for="ctName">Nombre</label>
+              <input id="ctName" name="Nombre" type="text" required>
+            </div>
+            <div class="field">
+              <label for="ctPhone">Teléfono</label>
+              <input id="ctPhone" name="Teléfono" type="tel">
+            </div>
+          </div>
+          <div class="field">
+            <label for="ctEmail">Email</label>
+            <input id="ctEmail" name="Email" type="email" required>
+          </div>
+          <div class="field">
+            <label for="ctMsg">Mensaje</label>
+            <textarea id="ctMsg" name="Mensaje" required placeholder="Cuéntanos tu obra..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Enviar mensaje</button>
+        </form>
+      </div>
+
+      <div class="side-info">
+        <h3>BHC</h3>
+        <div class="info-line">
+          <div class="icon">📍</div>
+          <div><b>Zona de servicio</b><span id="cfgZona">Valladolid capital y provincia</span></div>
+        </div>
+        <div class="info-line">
+          <div class="icon">📞</div>
+          <div><b>Teléfono</b><span id="cfgTelTxt">983 00 00 00</span></div>
+        </div>
+        <div class="info-line">
+          <div class="icon">✉️</div>
+          <div><b>Email</b><span id="cfgEmailTxt">info@pluma47.es</span></div>
+        </div>
+        <div class="info-line">
+          <div class="icon">🕒</div>
+          <div><b>Horario</b><span>Lunes a sábado, 7:00–20:00</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a href="#" class="brand">BHC</a>
+        <p style="color:var(--cement-dim); font-size:0.9rem; margin-top:14px; max-width:32ch;">Bombeo de hormigón para vivienda y obra en Valladolid. Pluma articulada, presupuesto claro y fecha reservada online.</p>
+      </div>
+      <div>
+        <h4>Navegación</h4>
+        <ul>
+          <li><a href="#servicios">Servicios</a></li>
+          <li><a href="#precios">Precios</a></li>
+          <li><a href="#disponibilidad">Disponibilidad</a></li>
+          <li><a href="#reservar">Reservar</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contacto</h4>
+        <ul>
+          <li><a href="tel:+34983000000">983 00 00 00</a></li>
+          <li><a href="mailto:info@pluma47.es">info@pluma47.es</a></li>
+          <li><a href="#contacto">Formulario de contacto</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span id="year"></span> BHC · Bombeo de hormigón, Valladolid</span>
+      <span>CIF: B00000000 · Aviso legal · Política de privacidad</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+<script src=" js/main.js"></script>
+</body>
+</html>

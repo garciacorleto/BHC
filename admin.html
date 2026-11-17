@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BHC | Administración</title>
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/admin.css" />
+  </head>
+
+  <body>
+    <header>
+      <h1>BHC | Panel de administración</h1>
+      <p>Gestión de camiones y reservas</p>
+    </header>
+
+    <main>
+      <section>
+        <h2>GESTIÓN DE CONDUCTORES</h2>
+
+        <form id="formConductor">
+          <label for="camionConductor">Selecciona un camión</label>
+
+          <select id="camionConductor" required>
+            <option value="">Selecciona un camión</option>
+            <option value="1">Camión 1</option>
+            <option value="2">Camión 2</option>
+            <option value="3">Camión 3</option>
+          </select>
+
+          <label for="nombreConductor">Nombre del conductor</label>
+          <input
+            type="text"
+            id="nombreConductor"
+            placeholder="Introduce el nombre del conductor"
+            required
+          />
+
+          <button type="submit">Asignar conductor</button>
+        </form>
+        <h3>Conductores asignados</h3>
+
+        <div id="listaConductores"></div>
+      </section>
+<section>
+    <h2>ESTADO DE LOS CAMIONES</h2>
+
+    <form id="formEstadoCamion">
+
+        <label for="camionEstado">Selecciona un camión</label>
+        <select id="camionEstado" required>
+            <option value="">Selecciona un camión</option>
+            <option value="1">Camión 1</option>
+            <option value="2">Camión 2</option>
+            <option value="3">Camión 3</option>
+        </select>
+
+        <label for="nuevoEstado">Estado del camión</label>
+        <select id="nuevoEstado" required>
+            <option value="">Selecciona un estado</option>
+            <option value="operativo">Operativo</option>
+            <option value="averiado">Averiado</option>
+            <option value="fuera_servicio">Fuera de servicio</option>
+        </select>
+
+        <button type="submit">Actualizar estado</button>
+
+    </form>
+</section>
+
+      <section>
+        <h2>Nueva reserva</h2>
+
+        <form id="formReserva">
+          <label for="camion">Camión</label>
+          <select id="camion" name="camion" required>
+            <option value="">Selecciona un camión</option>
+            <option value="1">Camión 1</option>
+            <option value="2">Camión 2</option>
+            <option value="3">Camión 3</option>
+          </select>
+
+          <label for="fecha">Fecha del trabajo</label>
+          <input type="date" id="fecha" name="fecha" required />
+
+          <label for="horaInicio">Hora de inicio</label>
+          <input type="time" id="horaInicio" name="horaInicio" required />
+
+          <label for="horaFin">Hora de finalización</label>
+          <input type="time" id="horaFin" name="horaFin" required />
+
+          <button type="submit">Guardar reserva</button>
+        </form>
+      </section>
+
+      <section class="listado-reservas">
+        <h2>RESERVAS CONFIRMADAS</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Camión</th>
+              <th>Conductor</th>
+              <th>Fecha</th>
+              <th>Inicio</th>
+              <th>Fin</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody id="listaReservas"></tbody>
+        </table>
+      </section>
+      <section class="listado-reservas">
+        <h2>HISTORIAL DE CANCELACIONES</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Camión</th>
+              <th>Fecha</th>
+              <th>Inicio</th>
+              <th>Fin</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+
+          <tbody id="listaCanceladas"></tbody>
+        </table>
+      </section>
+    </main>
+    <script src="js/admin.js"></script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+
+# Base de datos H2
+**/data/
+*.mv.db
+*.trace.db
+
+# Archivos generados por Maven
+**/target/
+
+# Configuración local de los IDE
+.idea/
+.idea_backup/
+.idea_backup2/
+.vscode/
+*.iml
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

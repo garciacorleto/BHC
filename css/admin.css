@@ -1,0 +1,240 @@
+/* Panel de administración BHC */
+
+body {
+    background-color: #1b1b1b;
+    color: #f5f5f5;
+}
+
+header {
+    padding: 30px;
+    background-color: #242424;
+}
+
+header h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+main {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+main section {
+    background-color: #292929;
+    padding: 30px;
+    border-radius: 10px;
+}
+
+main h2 {
+    margin-bottom: 25px;
+    color: #ff6500;
+}
+
+#formReserva {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#formReserva label {
+    margin-top: 10px;
+}
+
+#formReserva input,
+#formReserva select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #383838;
+    color: white;
+}
+
+#formReserva button {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #ff6500;
+    color: #111;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#formReserva button:hover {
+    background-color: #ff8533;
+}
+
+.listado-reservas table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+.listado-reservas th,
+.listado-reservas td {
+    padding: 15px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid #444;
+    display: table-cell;
+}
+
+
+.listado-reservas th {
+    color: #ff6a00;
+    font-weight: bold;
+}
+
+.listado-reservas td {
+    color: white;
+}
+
+.listado-reservas button {
+    padding: 8px 14px;
+    width: auto;
+    background-color: #b42318;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.listado-reservas button:hover {
+    background-color: #8f1d14;
+}
+
+/* GESTIÓN DE CONDUCTORES Y CAMIONES */
+
+#formConductor,
+#formEstadoCamion {
+    background: #242220;
+    padding: 25px;
+    border: 1px solid #3a3733;
+    border-radius: 8px;
+    margin-bottom: 25px;
+}
+
+#formConductor label,
+#formEstadoCamion label {
+    color: #c9c4b8;
+    font-weight: 600;
+}
+
+#formConductor input,
+#formConductor select,
+#formEstadoCamion select {
+    width: 100%;
+    padding: 12px;
+    background: #3a3733;
+    color: #edeae2;
+    border: 1px solid #57534c;
+    border-radius: 5px;
+}
+
+#formConductor input:focus,
+#formConductor select:focus,
+#formEstadoCamion select:focus {
+    outline: none;
+    border-color: #e8590c;
+}
+
+/* BOTONES PRINCIPALES DEL PANEL */
+
+#formReserva button,
+#formConductor button,
+#formEstadoCamion button {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: #e8590c;
+    color: #1c1b19;
+
+    border: none;
+    border-radius: 5px;
+    padding: 15px 22px;
+
+    font-family: 'Oswald', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+/* EFECTO AL PASAR EL RATÓN */
+
+#formReserva button:hover,
+#formConductor button:hover,
+#formEstadoCamion button:hover {
+    background-color: #ff6a1a;
+    transform: translateY(-2px);
+}
+
+/* TARJETAS DE LA FLOTA */
+
+#listaConductores {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+}
+
+#listaConductores > p {
+    background: #302d29;
+    border: 1px solid #57534c;
+    border-radius: 8px;
+    padding: 22px;
+    margin: 0;
+}
+
+#listaConductores h3 {
+    color: #e8590c;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+}
+
+#listaConductores p {
+    color: #edeae2;
+    margin-bottom: 15px;
+}
+
+/* ESTADOS DE LOS CAMIONES */
+
+.estado {
+    display: inline-block;
+    padding: 7px 12px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.estado.operativo {
+    background: rgba(76, 154, 106, 0.18);
+    color: #69c78c;
+}
+
+.estado.averiado {
+    background: rgba(224, 82, 82, 0.18);
+    color: #f08080;
+}
+
+.estado.fuera_servicio {
+    background: rgba(240, 180, 41, 0.18);
+    color: #f0b429;
+}
+
+/* ADAPTACIÓN A MÓVILES */
+
+@media (max-width: 800px) {
+    #listaConductores {
+        grid-template-columns: 1fr;
+    }
+}
