@@ -1,229 +1,729 @@
+
+/**
+ * ============================================================
+ * BHC - BOMBEOS DE HORMIGÓN CASAS
+ * Página web pública
+ * ============================================================
+ *
+ * Funcionalidades:
+ * - Configuración e información de contacto.
+ * - Menú de navegación para dispositivos móviles.
+ * - Calendario de disponibilidad de camiones.
+ * - Consulta de camiones y reservas mediante Spring Boot.
+ * - Envío de solicitudes de reserva mediante Formspree.
+ * - Envío de mensajes de contacto mediante Formspree.
+ * - Notificaciones para informar al usuario.
+ *
+ * IMPORTANTE:
+ * El calendario es informativo. Una fecha disponible
+ * no garantiza que el servicio pueda realizarse.
+ *
+ * El cliente envía una solicitud, pero la reserva
+ * únicamente queda confirmada cuando la empresa
+ * revisa y acepta el servicio.
+ *
+ * Backend: http://localhost:8080
+ * ============================================================
+ */
+
+
 /* ============================================================
-   CONFIG — edita aquí los datos de tu empresa
+   1. CONFIGURACIÓN GENERAL
    ============================================================ */
 
+/**
+ * Información de la empresa.
+ *
+ * Sustituir los datos provisionales por los definitivos
+ * antes de publicar la página web para clientes reales.
+ */
 const CONFIGURACION = {
   nombre: "Bombeos de Hormigon Casas",
   telefono: "983 00 00 00",
   email: "info@pluma47.es",
   zona: "Valladolid capital y provincia",
 
-  // Calendario de disponibilidad.
-  // Formato de fecha: "AAAA-MM-DD"
-  // Estados posibles: "free" (disponible), "tentative" (consultar), "busy" (ocupado)
-  // Cualquier día del mes que NO aparezca aquí se muestra neutro (sin marcar).
-  disponibilidad: {
-    // Ejemplo — sustituye por tus fechas reales:
-    "2026-08-03": "free",
-    "2026-08-04": "free",
-    "2026-08-05": "busy",
-    "2026-08-06": "busy",
-    "2026-08-07": "free",
-    "2026-08-10": "tentative",
-    "2026-08-11": "free",
-    "2026-08-12": "free",
-    "2026-08-13": "busy",
-    "2026-08-14": "free",
-    "2026-08-17": "free",
-    "2026-08-18": "tentative",
-    "2026-08-19": "free",
-    "2026-08-20": "busy",
-    "2026-08-21": "busy",
-    "2026-08-24": "free",
-    "2026-08-25": "free",
-    "2026-08-26": "tentative",
-    "2026-08-27": "free",
-    "2026-08-28": "free",
-  },
+  // Dirección del backend durante el desarrollo local.
+  apiUrl: "http://localhost:8080",
 };
 
-const camiones = JSON.parse(localStorage.getItem("camionesBHC")) || [
-    { id: 1, nombre: "Camión 1", conductor: "Sin asignar", estado: "operativo" },
-    { id: 2, nombre: "Camión 2", conductor: "Sin asignar", estado: "operativo" },
-    { id: 3, nombre: "Camión 3", conductor: "Sin asignar", estado: "operativo" }
-];
-const reservas = JSON.parse(localStorage.getItem("reservasBHC")) || [];
-console.table(camiones);
-console.table(reservas);
 
+/* ============================================================
+   2. DATOS DE CAMIONES Y RESERVAS
+   ============================================================ */
+
+/**
+ * Estos arrays almacenan temporalmente los datos
+ * recibidos desde Spring Boot.
+ *
+ * La fuente de información es la base de datos H2,
+ * no el almacenamiento local del navegador.
+ */
+let camiones = [];
+let reservas = [];
+
+/**
+ * Indica si hemos podido obtener los datos del backend.
+ *
+ * Si la conexión falla, no debemos mostrar días como
+ * disponibles sin conocer las reservas existentes.
+ */
+let datosDisponibilidadCargados = false;
+
+
+/* ============================================================
+   3. COMUNICACIÓN CON SPRING BOOT
+   ============================================================ */
+
+/**
+ * Obtiene los camiones y las reservas desde la API REST.
+ *
+ * Endpoint de camiones:
+ * GET /camiones
+ *
+ * Endpoint de reservas:
+ * GET /reservas
+ *
+ * @returns {Promise<boolean>}
+ * true si se han obtenido ambos conjuntos de datos.
+ * false si ha ocurrido algún error.
+ */
+async function obtenerDatosDisponibilidad() {
+  // Mientras cargamos, no consideramos válidos
+  // los datos anteriores.
+  datosDisponibilidadCargados = false;
+
+  try {
+    // Solicitamos los camiones y las reservas.
+    const [respuestaCamiones, respuestaReservas] =
+      await Promise.all([
+        fetch(`${CONFIGURACION.apiUrl}/camiones`),
+        fetch(`${CONFIGURACION.apiUrl}/reservas`),
+      ]);
+
+    // Comprobamos las respuestas HTTP.
+    if (!respuestaCamiones.ok || !respuestaReservas.ok) {
+      throw new Error(
+        "El servidor no ha podido proporcionar la disponibilidad."
+      );
+    }
+
+    // Convertimos las respuestas JSON en arrays.
+    const datosCamiones = await respuestaCamiones.json();
+    const datosReservas = await respuestaReservas.json();
+
+    // Comprobamos que la información recibida
+    // tiene el formato esperado.
+    if (
+      !Array.isArray(datosCamiones) ||
+      !Array.isArray(datosReservas)
+    ) {
+      throw new Error(
+        "Los datos recibidos del servidor no son válidos."
+      );
+    }
+
+    // Actualizamos los datos de la página pública.
+    camiones = datosCamiones;
+    reservas = datosReservas;
+
+    datosDisponibilidadCargados = true;
+
+    console.log("Disponibilidad actualizada correctamente.");
+
+    return true;
+
+  } catch (error) {
+    console.error(
+      "Error al consultar la disponibilidad:",
+      error
+    );
+
+    // Evitamos utilizar información incompleta.
+    camiones = [];
+    reservas = [];
+    datosDisponibilidadCargados = false;
+
+    return false;
+  }
+}
+
+
+/* ============================================================
+   4. CONSULTA DE DISPONIBILIDAD
+   ============================================================ */
+
+/**
+ * Obtiene los camiones disponibles para una fecha.
+ *
+ * Reglas actuales del backend:
+ * - El camión debe estar operativo.
+ * - No debe tener una reserva confirmada ese día.
+ * - Las reservas canceladas no bloquean disponibilidad.
+ *
+ * IMPORTANTE:
+ * Esta consulta es informativa y no realiza reservas.
+ *
+ * @param {string} fecha - Fecha en formato AAAA-MM-DD.
+ * @returns {Array} Camiones disponibles.
+ */
 function consultarDisponibilidad(fecha) {
+
+  // Obtenemos las reservas confirmadas del día.
   const reservasDelDia = reservas.filter(
-    (reserva) => reserva.fecha === fecha && reserva.estado === "confirmada",
+    (reserva) =>
+      reserva.fecha === fecha &&
+      reserva.estado === "confirmada"
   );
+
+  // Filtramos los camiones operativos que no
+  // tengan una reserva confirmada ese día.
   const camionesLibres = camiones.filter(
     (camion) =>
       camion.estado === "operativo" &&
-      !reservasDelDia.some((reserva) => reserva.camionId === camion.id),
+      !reservasDelDia.some(
+        (reserva) => reserva.camionId === camion.id
+      )
   );
+
   return camionesLibres;
 }
-const libres = consultarDisponibilidad("2026-11-03");
 
-console.log("Camiones disponibles:", libres.length);
 
-document.getElementById("year").textContent = new Date().getFullYear();
+/**
+ * Determina el estado visual de una fecha.
+ *
+ * Estados:
+ * - free: dos o más camiones disponibles.
+ * - tentative: un camión disponible.
+ * - busy: ningún camión disponible.
+ * - unknown: información no disponible.
+ *
+ * @param {string} fecha
+ * @returns {string}
+ */
+function obtenerEstadoDisponibilidad(fecha) {
 
-/* ---------- menú móvil ---------- */
-const burger = document.getElementById("burger");
-const navLinks = document.getElementById("navLinks");
-burger.addEventListener("click", () => navLinks.classList.toggle("open"));
-navLinks
-  .querySelectorAll("a")
-  .forEach((a) =>
-    a.addEventListener("click", () => navLinks.classList.remove("open")),
-  );
+  // Si el backend no ha respondido, no podemos
+  // asegurar la disponibilidad de ningún día.
+  if (!datosDisponibilidadCargados) {
+    return "unknown";
+  }
 
-/* ---------- calendario ---------- */
-const dow = ["L", "M", "X", "J", "V", "S", "D"];
-let fechaCalendario = new Date();
-fechaCalendario.setDate(1);
+  const cantidadLibres =
+    consultarDisponibilidad(fecha).length;
 
-function pad(n) {
-  return n.toString().padStart(2, "0");
+  if (cantidadLibres >= 2) {
+    return "free";
+  }
+
+  if (cantidadLibres === 1) {
+    return "tentative";
+  }
+
+  return "busy";
 }
 
+
+/* ============================================================
+   5. FECHAS Y FUNCIONES AUXILIARES
+   ============================================================ */
+
+/**
+ * Añade un cero delante de los números menores que 10.
+ *
+ * Ejemplo:
+ * pad(5) devuelve "05".
+ *
+ * @param {number} numero
+ * @returns {string}
+ */
+function pad(numero) {
+  return numero.toString().padStart(2, "0");
+}
+
+
+/**
+ * Convierte una fecha JavaScript al formato AAAA-MM-DD
+ * utilizando la fecha local del navegador.
+ *
+ * Evita utilizar toISOString(), que trabaja con UTC
+ * y podría marcar otro día según la zona horaria.
+ *
+ * @param {Date} fecha
+ * @returns {string}
+ */
+function formatearFechaLocal(fecha) {
+
+  const year = fecha.getFullYear();
+  const month = pad(fecha.getMonth() + 1);
+  const day = pad(fecha.getDate());
+
+  return `${year}-${month}-${day}`;
+}
+
+
+/* ============================================================
+   6. MENÚ DE NAVEGACIÓN MÓVIL
+   ============================================================ */
+
+const burger = document.getElementById("burger");
+const navLinks = document.getElementById("navLinks");
+
+/**
+ * Abre o cierra el menú móvil.
+ */
+if (burger && navLinks) {
+
+  burger.addEventListener("click", () => {
+    navLinks.classList.toggle("open");
+  });
+
+  /**
+   * Cierra el menú cuando el usuario
+   * selecciona un enlace de navegación.
+   */
+  navLinks.querySelectorAll("a").forEach((enlace) => {
+
+    enlace.addEventListener("click", () => {
+      navLinks.classList.remove("open");
+    });
+
+  });
+}
+
+
+/* ============================================================
+   7. CALENDARIO DE DISPONIBILIDAD
+   ============================================================ */
+
+// Días de la semana, empezando por el lunes.
+const dow = ["L", "M", "X", "J", "V", "S", "D"];
+
+// Mes que se está mostrando en el calendario.
+let fechaCalendario = new Date();
+
+// Situamos la fecha en el primer día del mes.
+fechaCalendario.setDate(1);
+
+// Nombres de los meses.
+const nombresMeses = [
+  "Enero",
+  "Febrero",
+  "Marzo",
+  "Abril",
+  "Mayo",
+  "Junio",
+  "Julio",
+  "Agosto",
+  "Septiembre",
+  "Octubre",
+  "Noviembre",
+  "Diciembre",
+];
+
+
+/**
+ * Dibuja el calendario correspondiente al mes actual.
+ *
+ * Para cada día consulta los camiones disponibles
+ * y asigna un estado visual.
+ *
+ * El calendario no permite confirmar reservas:
+ * únicamente informa de la disponibilidad estimada.
+ */
 function mostrarCalendario() {
+
   const grid = document.getElementById("calGrid");
   const title = document.getElementById("calTitle");
-  grid.innerHTML = "";
-  const nombreMes = [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre",
-  ];
-  title.textContent =
-    nombreMes[fechaCalendario.getMonth()] + " " + fechaCalendario.getFullYear();
 
-  dow.forEach((d) => {
-    const el = document.createElement("div");
-    el.className = "cal-dow";
-    el.textContent = d;
-    grid.appendChild(el);
-  });
+  // Si los elementos no existen, no intentamos dibujar.
+  if (!grid || !title) {
+    return;
+  }
+
+  // Limpiamos el calendario anterior.
+  grid.innerHTML = "";
 
   const year = fechaCalendario.getFullYear();
   const month = fechaCalendario.getMonth();
-  const firstDay = new Date(year, month, 1);
-  let startOffset = firstDay.getDay() - 1; // lunes = 0
-  if (startOffset < 0) startOffset = 6;
 
-  const diasDelMes = new Date(year, month + 1, 0).getDate();
-  const todayStr = new Date().toISOString().slice(0, 10);
+  // Mostramos el mes y el año.
+  title.textContent =
+    `${nombresMeses[month]} ${year}`;
 
-  for (let i = 0; i < startOffset; i++) {
-    const el = document.createElement("div");
-    el.className = "cal-day empty";
-    grid.appendChild(el);
+  // Dibujamos los nombres de los días de la semana.
+  dow.forEach((dia) => {
+
+    const elemento = document.createElement("div");
+
+    elemento.className = "cal-dow";
+    elemento.textContent = dia;
+
+    grid.appendChild(elemento);
+  });
+
+  // Calculamos el día de la semana en el que
+  // comienza el mes.
+  const primerDia = new Date(year, month, 1);
+
+  let desplazamiento = primerDia.getDay() - 1;
+
+  // En JavaScript, el domingo es 0.
+  // Lo ajustamos para que la semana empiece en lunes.
+  if (desplazamiento < 0) {
+    desplazamiento = 6;
   }
 
-  for (let d = 1; d <= diasDelMes; d++) {
-    const dateStr = `${year}-${pad(month + 1)}-${pad(d)}`;
-    const el = document.createElement("div");
-    const camionesLibres = consultarDisponibilidad(dateStr);
+  // Obtenemos el número de días del mes.
+  const diasDelMes =
+    new Date(year, month + 1, 0).getDate();
 
-    let status = "busy";
+  // Fecha actual según la hora local del navegador.
+  const fechaHoy = formatearFechaLocal(new Date());
 
-    if (camionesLibres.length >= 2) {
-      status = "free";
-    } else if (camionesLibres.length === 1) {
-      status = "tentative";
-    } else {
-      status = "busy";
+  // Añadimos celdas vacías antes del primer día.
+  for (let i = 0; i < desplazamiento; i++) {
+
+    const elemento = document.createElement("div");
+
+    elemento.className = "cal-day empty";
+
+    grid.appendChild(elemento);
+  }
+
+  // Dibujamos todos los días del mes.
+  for (let dia = 1; dia <= diasDelMes; dia++) {
+
+    const fecha =
+      `${year}-${pad(month + 1)}-${pad(dia)}`;
+
+    const elemento = document.createElement("div");
+
+    // Consultamos la disponibilidad del día.
+    const estado = obtenerEstadoDisponibilidad(fecha);
+
+    // Para el estado desconocido utilizamos una
+    // celda neutra, sin clases de disponibilidad.
+    let clases = "cal-day";
+
+    if (estado !== "unknown") {
+      clases += ` ${estado}`;
     }
-    el.className =
-      "cal-day" +
-      (status ? " " + status : "") +
-      (dateStr === todayStr ? " today" : "");
-    el.textContent = d;
-    el.title =
-      status === "free"
-        ? "Disponible"
-        : status === "busy"
-          ? "Ocupado"
-          : status === "tentative"
-            ? "Consultar disponibilidad"
-            : "";
-    grid.appendChild(el);
+
+    // Marcamos el día actual.
+    if (fecha === fechaHoy) {
+      clases += " today";
+    }
+
+    elemento.className = clases;
+    elemento.textContent = dia;
+
+    // Texto informativo al pasar el ratón.
+    if (estado === "free") {
+
+      elemento.title = "Disponibilidad estimada";
+
+    } else if (estado === "tentative") {
+
+      elemento.title = "Consultar disponibilidad";
+
+    } else if (estado === "busy") {
+
+      elemento.title = "Sin camiones disponibles";
+
+    } else {
+
+      elemento.title =
+        "Disponibilidad no disponible. Contacta con la empresa.";
+    }
+
+    grid.appendChild(elemento);
   }
 }
-document.getElementById("calPrev").addEventListener("click", () => {
-  fechaCalendario.setMonth(fechaCalendario.getMonth() - 1);
-  mostrarCalendario();
-});
-document.getElementById("calNext").addEventListener("click", () => {
-  fechaCalendario.setMonth(fechaCalendario.getMonth() + 1);
-  mostrarCalendario();
-});
-mostrarCalendario();
 
-/* ---------- datos de contacto en la web ---------- */
-document.getElementById("cfgZona").textContent = CONFIGURACION.zona;
-document.getElementById("cfgTelTxt").textContent = CONFIGURACION.telefono;
-document.getElementById("cfgEmailTxt").textContent = CONFIGURACION.email;
 
-/* ---------- envío de formularios (Formspree) ---------- */
-function configurarFormulario(formEl, successMsg) {
-  formEl.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const btn = formEl.querySelector('button[type="submit"]');
-    const originalText = btn.textContent;
+/**
+ * Configura los botones para cambiar de mes.
+ */
+function configurarNavegacionCalendario() {
 
-    if (formEl.action.includes("TU_ID_DE_FORMSPREE")) {
-      mostrarNotificacion(
-        "Falta configurar Formspree: sustituye TU_ID_DE_FORMSPREE por tu ID real en el código.",
-        true,
+  const botonAnterior =
+    document.getElementById("calPrev");
+
+  const botonSiguiente =
+    document.getElementById("calNext");
+
+  if (botonAnterior) {
+
+    botonAnterior.addEventListener("click", () => {
+
+      fechaCalendario.setMonth(
+        fechaCalendario.getMonth() - 1
       );
+
+      mostrarCalendario();
+    });
+  }
+
+  if (botonSiguiente) {
+
+    botonSiguiente.addEventListener("click", () => {
+
+      fechaCalendario.setMonth(
+        fechaCalendario.getMonth() + 1
+      );
+
+      mostrarCalendario();
+    });
+  }
+}
+
+
+/* ============================================================
+   8. INFORMACIÓN DE CONTACTO
+   ============================================================ */
+
+/**
+ * Inserta los datos de contacto en los elementos HTML.
+ */
+function mostrarDatosContacto() {
+
+  const zona = document.getElementById("cfgZona");
+  const telefono = document.getElementById("cfgTelTxt");
+  const email = document.getElementById("cfgEmailTxt");
+  const year = document.getElementById("year");
+
+  if (zona) {
+    zona.textContent = CONFIGURACION.zona;
+  }
+
+  if (telefono) {
+    telefono.textContent = CONFIGURACION.telefono;
+  }
+
+  if (email) {
+    email.textContent = CONFIGURACION.email;
+  }
+
+  if (year) {
+    year.textContent = new Date().getFullYear();
+  }
+}
+
+
+/* ============================================================
+   9. FORMULARIOS DE CONTACTO Y RESERVA
+   ============================================================ */
+
+/**
+ * Configura el envío de un formulario mediante Formspree.
+ *
+ * El formulario de reserva envía una SOLICITUD.
+ * No crea una reserva confirmada en Spring Boot.
+ *
+ * @param {HTMLFormElement} formEl
+ * @param {string} mensajeExito
+ */
+function configurarFormulario(formEl, mensajeExito) {
+
+  // Evitamos errores si el formulario no existe.
+  if (!formEl) {
+    return;
+  }
+
+  formEl.addEventListener("submit", async (evento) => {
+
+    // Evitamos la recarga automática de la página.
+    evento.preventDefault();
+
+    const boton =
+      formEl.querySelector('button[type="submit"]');
+
+    if (!boton) {
       return;
     }
 
-    btn.textContent = "Enviando...";
-    btn.disabled = true;
+    const textoOriginal = boton.textContent;
+
+    // Comprobamos que exista una dirección de envío
+    // y que no siga utilizando el identificador de ejemplo.
+    const direccionFormulario = formEl.action;
+
+    if (
+      !direccionFormulario ||
+      direccionFormulario.includes("TU_ID_DE_FORMSPREE") ||
+      !direccionFormulario.startsWith(
+        "https://formspree.io/f/"
+      )
+    ) {
+
+      mostrarNotificacion(
+        "El formulario todavía no está configurado. Contacta con la empresa por teléfono.",
+        true
+      );
+
+      return;
+    }
+
+    // Bloqueamos temporalmente el botón para evitar
+    // que el usuario envíe varias veces el formulario.
+    boton.textContent = "Enviando...";
+    boton.disabled = true;
+
     try {
-      const res = await fetch(formEl.action, {
+
+      // Enviamos los datos a Formspree.
+      const respuesta = await fetch(direccionFormulario, {
+
         method: "POST",
+
         body: new FormData(formEl),
-        headers: { Accept: "application/json" },
+
+        headers: {
+          Accept: "application/json"
+        }
+
       });
-      if (res.ok) {
-        mostrarNotificacion(successMsg, false);
+
+      if (respuesta.ok) {
+
+        // Informamos del envío correcto.
+        mostrarNotificacion(mensajeExito, false);
+
+        // Limpiamos el formulario.
         formEl.reset();
+
       } else {
+
         mostrarNotificacion(
           "No se ha podido enviar. Prueba de nuevo o llama por teléfono.",
-          true,
+          true
         );
       }
-    } catch (err) {
+
+    } catch (error) {
+
+      console.error(
+        "Error al enviar el formulario:",
+        error
+      );
+
       mostrarNotificacion(
         "Error de conexión. Prueba de nuevo en unos minutos.",
-        true,
+        true
       );
+
+    } finally {
+
+      // Restauramos el botón tanto si el envío
+      // ha funcionado como si ha fallado.
+      boton.textContent = textoOriginal;
+      boton.disabled = false;
     }
-    btn.textContent = originalText;
-    btn.disabled = false;
   });
 }
-configurarFormulario(
-  document.getElementById("bookingForm"),
-  "¡Solicitud de reserva enviada! Te contactamos para confirmar la fecha.",
-);
-configurarFormulario(
-  document.getElementById("contactForm"),
-  "¡Mensaje enviado! Te respondemos lo antes posible.",
-);
 
-function mostrarNotificacion(msg, isError) {
+
+/* ============================================================
+   10. NOTIFICACIONES
+   ============================================================ */
+
+let temporizadorNotificacion = null;
+
+/**
+ * Muestra un mensaje temporal en pantalla.
+ *
+ * @param {string} mensaje
+ * @param {boolean} esError
+ */
+function mostrarNotificacion(mensaje, esError) {
+
   const toast = document.getElementById("toast");
-  toast.textContent = msg;
-  toast.className = "toast show" + (isError ? " error" : "");
-  setTimeout(() => toast.classList.remove("show"), 5000);
+
+  if (!toast) {
+    console.warn(mensaje);
+    return;
+  }
+
+  // Si ya había una notificación activa,
+  // cancelamos su temporizador anterior.
+  if (temporizadorNotificacion !== null) {
+    clearTimeout(temporizadorNotificacion);
+  }
+
+  toast.textContent = mensaje;
+
+  toast.className =
+    "toast show" + (esError ? " error" : "");
+
+  // Ocultamos la notificación después de 5 segundos.
+  temporizadorNotificacion = setTimeout(() => {
+
+    toast.classList.remove("show");
+
+    temporizadorNotificacion = null;
+
+  }, 5000);
 }
+
+
+/* ============================================================
+   11. INICIALIZACIÓN DE LA PÁGINA
+   ============================================================ */
+
+/**
+ * Prepara las funcionalidades principales
+ * cuando se carga la página pública.
+ *
+ * Orden de ejecución:
+ * 1. Mostrar datos de contacto.
+ * 2. Configurar navegación del calendario.
+ * 3. Configurar formularios.
+ * 4. Mostrar calendario inicialmente neutro.
+ * 5. Consultar disponibilidad en Spring Boot.
+ * 6. Actualizar el calendario con datos reales.
+ */
+async function iniciarPagina() {
+
+  // Información general.
+  mostrarDatosContacto();
+
+  // Navegación entre meses.
+  configurarNavegacionCalendario();
+
+  // Formulario de solicitud de reserva.
+  configurarFormulario(
+    document.getElementById("bookingForm"),
+    "¡Solicitud enviada! Te contactaremos para confirmar la fecha."
+  );
+
+  // Formulario de contacto.
+  configurarFormulario(
+    document.getElementById("contactForm"),
+    "¡Mensaje enviado! Te responderemos lo antes posible."
+  );
+
+  // Dibujamos inicialmente un calendario neutro.
+  mostrarCalendario();
+
+  // Consultamos la información del backend.
+  const datosCargados =
+    await obtenerDatosDisponibilidad();
+
+  // Actualizamos el calendario con el resultado.
+  mostrarCalendario();
+
+  // Si el backend no responde, avisamos al visitante.
+  if (!datosCargados) {
+
+    mostrarNotificacion(
+      "No podemos consultar la disponibilidad ahora mismo. Puedes enviar una solicitud o contactar con la empresa.",
+      true
+    );
+  }
+}
+
+
+// Iniciamos la página pública.
+iniciarPagina();

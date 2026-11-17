@@ -4,29 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BHC · Bombeos de Hormigón Casas</title>
-<meta name="description" content="Bombeo de hormigón para vivienda, piscinas, cimentaciones y obra en Valladolid y provincia. Presupuesto y reserva de fecha online.">
+<meta name="description" content="Bombeo de hormigón para vivienda, piscinas, cimentaciones y obra en Valladolid y provincia. Consulta de disponibilidad y solicitud de presupuesto online.">
 
 <!--
   ============================================================
-  CÓMO EDITAR ESTA WEB — LÉEME PRIMERO
+  BHC - PÁGINA WEB PÚBLICA
   ============================================================
-  1) Busca el bloque "CONFIG" dentro de la etiqueta <script> al
-     final del archivo. Ahí están: nombre de la empresa, teléfono,
-     email, dirección, precios y el calendario de disponibilidad.
-     Todo eso se edita sin tocar el resto del código.
-  2) Para que el formulario de CONTACTO y el de RESERVA lleguen
-     de verdad a tu email, este archivo usa un servicio gratuito
-     llamado Formspree (no necesitas programar nada):
-       a. Entra en https://formspree.io y crea una cuenta gratuita
-          con el email donde quieres recibir los mensajes.
-       b. Crea un "New Form" y copia el ID que te da
-          (algo como "xzzlqoyv").
-       c. Busca en este archivo, dos veces, el texto:
-             TU_ID_DE_FORMSPREE
-          y sustitúyelo por ese ID en las dos líneaspero pero
-          "form action=".
-     Hasta que hagas esto, los formularios no enviarán el email
-     (pero se puede editar y ver toda la web perfectamente).
+  Estructura:
+  - css/style.css: diseño y estilos visuales.
+  - js/main.js: menú móvil, calendario, API y formularios.
+  - backend/: API REST de Spring Boot y persistencia H2.
+
+  Funcionamiento de reservas:
+  - El calendario muestra disponibilidad orientativa consultada
+    al backend mientras este esté accesible.
+  - El formulario envía una SOLICITUD mediante Formspree.
+  - La solicitud NO crea ni confirma una reserva en H2.
+  - El propietario debe revisar y confirmar el servicio.
+
+  Antes de publicar para clientes reales:
+  - Sustituir teléfono, email, CIF y datos comerciales de ejemplo.
+  - Confirmar las tarifas, características de flota y plazos.
+  - Configurar los dos endpoints de Formspree.
+  - Preparar el despliegue público del backend y su URL en main.js.
+  - Añadir aviso legal y política de privacidad reales.
+  - Proteger el panel de administración con autenticación.
   ============================================================
 -->
 
@@ -38,25 +40,27 @@
 </head>
 <body>
 
+<!-- CABECERA: navegación principal y acceso a solicitud de fecha. -->
 <header>
   <nav class="nav">
-    <a href="#" class="brand">BHC</span></a>
+    <a href="#" class="brand">BHC</a>
     <div class="nav-links" id="navLinks">
       <a href="#servicios">Servicios</a>
       <a href="#flota">Flota</a>
       <a href="#precios">Precios</a>
       <a href="#disponibilidad">Disponibilidad</a>
-      <a href="#reservar">Reservar</a>
+      <a href="#reservar">Solicitar fecha</a>
       <a href="#contacto">Contacto</a>
     </div>
     <div class="nav-cta">
       <a class="nav-phone" href="tel:+34983000000">📞 983 00 00 00</a>
-      <a href="#reservar" class="btn btn-primary">Reservar fecha</a>
-      <button class="burger" id="burger" aria-label="Abrir menú"><span></span><span></span><span></span></button>
+      <a href="#reservar" class="btn btn-primary">Solicitar fecha</a>
+      <button class="burger" id="burger" type="button" aria-label="Abrir menú"><span></span><span></span><span></span></button>
     </div>
   </nav>
 </header>
 
+<!-- PRESENTACIÓN: propuesta de valor y llamada a la acción. -->
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
@@ -64,13 +68,13 @@
       <h1>Hormigón <em>bombeado</em> hasta donde una carretilla nunca llegaría.</h1>
       <p class="hero-sub">Cimentaciones, soleras, forjados y piscinas para vivienda y obra en Valladolid capital y alrededores. Pides fecha, te confirmamos y llegamos con la pluma lista.</p>
       <div class="hero-ctas">
-        <a href="#reservar" class="btn btn-primary">Reservar una fecha</a>
+        <a href="#reservar" class="btn btn-primary">Solicitar una fecha</a>
         <a href="#precios" class="btn btn-ghost">Ver precios</a>
       </div>
       <div class="hero-stats">
-        <div class="stat"><b>32 m</b><span>Alcance vertical</span></div>
-        <div class="stat"><b>90 m³/h</b><span>Caudal máximo</span></div>
-        <div class="stat"><b>24–48 h</b><span>Confirmación de fecha</span></div>
+        <div class="stat"><b>3</b><span>Equipos de bombeo</span></div>
+        <div class="stat"><b>BHC</b><span>Atención directa</span></div>
+        <div class="stat"><b>Online</b><span>Solicitud de fecha</span></div>
       </div>
     </div>
 
@@ -112,6 +116,7 @@
   </div>
 </section>
 
+<!-- SERVICIOS: información comercial sobre los trabajos. -->
 <section id="servicios">
   <div class="wrap">
     <div class="section-head">
@@ -155,13 +160,13 @@
       </div>
       <div class="p-step">
         <div class="n">02</div>
-        <h4>Te mandamos presupuesto</h4>
-        <p>Precio cerrado por m³, desplazamiento incluido, en menos de 24-48 h.</p>
+        <h4>Revisamos tu solicitud</h4>
+        <p>Estudiamos los detalles del trabajo y te comunicamos las condiciones y el presupuesto.</p>
       </div>
       <div class="p-step">
         <div class="n">03</div>
-        <h4>Reservas la fecha</h4>
-        <p>Consultas el calendario y bloqueas el día que te interesa desde la propia web.</p>
+        <h4>Confirmamos la fecha</h4>
+        <p>Tras comprobar disponibilidad y condiciones, acordamos contigo la fecha del servicio.</p>
       </div>
       <div class="p-step">
         <div class="n">04</div>
@@ -172,6 +177,7 @@
   </div>
 </section>
 
+<!-- FLOTA: características comerciales; verificar con el propietario. -->
 <section id="flota">
   <div class="wrap">
     <div class="section-head">
@@ -194,12 +200,13 @@
   </div>
 </section>
 
+<!-- TARIFAS: datos orientativos que requieren validación comercial. -->
 <section id="precios">
   <div class="wrap">
     <div class="section-head">
-      <div class="eyebrow">Precios</div>
-      <h2>Tarifas claras, sin sorpresas el día del vertido</h2>
-      <p>Precios orientativos para obra de vivienda en Valladolid capital. El presupuesto final depende de m³, acceso y distancia.</p>
+      <div class="eyebrow">Precios orientativos</div>
+      <h2>Tarifas orientativas para planificar tu obra</h2>
+      <p>Importes de ejemplo pendientes de validar con la empresa. El presupuesto final dependerá del volumen, el acceso y la distancia.</p>
     </div>
     <div class="price-grid">
       <div class="price-card">
@@ -211,7 +218,7 @@
           <li>Desplazamiento incluido en capital</li>
           <li>Ideal para soleras y piscinas</li>
         </ul>
-        <a href="#reservar" class="btn btn-ghost btn-block">Reservar este equipo</a>
+        <a href="#reservar" class="btn btn-ghost btn-block">Solicitar este equipo</a>
       </div>
       <div class="price-card featured">
         <span class="tag">Pluma 32 m · más contratada</span>
@@ -222,7 +229,7 @@
           <li>Desplazamiento incluido hasta 15 km</li>
           <li>Cimentación, forjado o solera completa</li>
         </ul>
-        <a href="#reservar" class="btn btn-primary btn-block">Reservar este equipo</a>
+        <a href="#reservar" class="btn btn-primary btn-block">Solicitar este equipo</a>
       </div>
       <div class="price-card">
         <span class="tag">Pluma 36 m</span>
@@ -233,27 +240,28 @@
           <li>Mayor alcance para patios interiores</li>
           <li>Presupuesto según distancia real</li>
         </ul>
-        <a href="#reservar" class="btn btn-ghost btn-block">Reservar este equipo</a>
+        <a href="#reservar" class="btn btn-ghost btn-block">Solicitar este equipo</a>
       </div>
     </div>
-    <p class="price-note">IVA no incluido · Hora de espera adicional: 45 €/h · Kilometraje fuera de capital: 1,10 €/km · Precios editables por el propietario en el bloque CONFIG del código.</p>
+    <p class="price-note">IMPORTANTE: tarifas y condiciones mostradas como ejemplo; deben validarse con el propietario antes de publicar la web. IVA y posibles costes adicionales según presupuesto.</p>
   </div>
 </section>
 
+<!-- CALENDARIO: main.js consulta Spring Boot para colorear cada fecha. -->
 <section id="disponibilidad">
   <div class="wrap">
     <div class="section-head">
       <div class="eyebrow">Disponibilidad</div>
-      <h2>Consulta el calendario antes de reservar</h2>
-      <p>Estas son las fechas con hueco para las próximas semanas. Si tu fecha aparece en verde, puedes reservarla directamente en el siguiente formulario.</p>
+      <h2>Consulta la disponibilidad antes de solicitar fecha</h2>
+      <p>El calendario muestra la disponibilidad estimada según las reservas confirmadas. Aunque una fecha aparezca libre, el servicio requiere confirmación de la empresa.</p>
     </div>
     <div class="avail-wrap">
       <div class="cal">
         <div class="cal-head">
           <h3 id="calTitle">Mes</h3>
           <div class="cal-nav">
-            <button id="calPrev" aria-label="Mes anterior">←</button>
-            <button id="calNext" aria-label="Mes siguiente">→</button>
+            <button id="calPrev" type="button" aria-label="Mes anterior">←</button>
+            <button id="calNext" type="button" aria-label="Mes siguiente">→</button>
           </div>
         </div>
         <div class="cal-grid" id="calGrid"></div>
@@ -265,37 +273,38 @@
       </div>
       <div class="avail-note">
         <h4>¿No ves hueco esta semana?</h4>
-        <p>El calendario se actualiza a mano según la agenda de la autobomba. Si tu fecha ideal sale en gris, escríbenos: a veces hay margen moviendo otra obra o sumando un segundo equipo.</p>
+        <p>El calendario consulta los datos del sistema de reservas. Si una fecha aparece sin color, puede que no se haya podido consultar la disponibilidad. En cualquier caso, puedes escribirnos para estudiar tu obra.</p>
         <a href="#contacto" class="btn btn-ghost btn-block">Preguntar por otra fecha</a>
       </div>
     </div>
   </div>
 </section>
 
+<!-- SOLICITUD: Formspree envía el formulario; NO confirma reservas en H2. -->
 <section id="reservar">
   <div class="wrap">
     <div class="form-wrap">
       <div>
-        <div class="eyebrow">Reserva de fecha</div>
-        <h2>Bloquea tu día de bombeo</h2>
-        <p class="hero-sub">Rellena los datos de la obra. En cuanto lo recibamos, te confirmamos la fecha por teléfono o email.</p>
+        <div class="eyebrow">Solicitud de fecha</div>
+        <h2>Solicita tu fecha de bombeo</h2>
+        <p class="hero-sub">Cuéntanos los detalles de la obra. Revisaremos tu solicitud y contactaremos contigo por teléfono o email para confirmar si podemos realizar el servicio.</p>
 
-        <!-- FORMULARIO DE RESERVA — sustituye TU_ID_DE_FORMSPREE por tu ID real -->
+        <!-- Sustituir TU_ID_DE_FORMSPREE por el endpoint real del formulario de solicitudes. -->
         <form id="bookingForm" action="https://formspree.io/f/TU_ID_DE_FORMSPREE" method="POST">
-          <input type="hidden" name="_subject" value="Nueva reserva de bombeo — PLUMA47">
+          <input type="hidden" name="_subject" value="Nueva solicitud de bombeo - BHC">
           <div class="field-row">
             <div class="field">
               <label for="bkName">Nombre y apellidos</label>
-              <input id="bkName" name="Nombre" type="text" required>
+              <input id="bkName" name="Nombre" type="text" autocomplete="name" required>
             </div>
             <div class="field">
               <label for="bkPhone">Teléfono</label>
-              <input id="bkPhone" name="Teléfono" type="tel" required>
+              <input id="bkPhone" name="Teléfono" type="tel" autocomplete="tel" required>
             </div>
           </div>
           <div class="field">
             <label for="bkEmail">Email</label>
-            <input id="bkEmail" name="Email" type="email" required>
+            <input id="bkEmail" name="Email" type="email" autocomplete="email" required>
           </div>
           <div class="field">
             <label for="bkAddress">Dirección de la obra</label>
@@ -304,6 +313,7 @@
           <div class="field-row">
             <div class="field">
               <label for="bkDate">Fecha deseada</label>
+              <!-- Pendiente: validar fecha no anterior a hoy también en JavaScript. -->
               <input id="bkDate" name="Fecha deseada" type="date" required>
             </div>
             <div class="field">
@@ -326,8 +336,8 @@
             <label for="bkMsg">Notas sobre el acceso (opcional)</label>
             <textarea id="bkMsg" name="Notas" placeholder="Ancho de calle, obstáculos, cables aéreos..."></textarea>
           </div>
-          <button type="submit" class="btn btn-primary btn-block">Enviar reserva</button>
-          <p class="form-note">Esto es una solicitud de reserva, no una confirmación definitiva: te contactamos para cerrar la fecha.</p>
+          <button type="submit" class="btn btn-primary btn-block">Enviar solicitud</button>
+          <p class="form-note">El envío no garantiza una reserva. La empresa revisará la disponibilidad y las características de la obra antes de confirmar el servicio.</p>
         </form>
       </div>
 
@@ -343,13 +353,14 @@
         </div>
         <div class="info-line">
           <div class="icon">③</div>
-          <div><b>Confirmación en 24–48 h</b><span>Te llamamos para cerrar hora exacta y comprobar el acceso con foto o dirección.</span></div>
+          <div><b>Confirmación por la empresa</b><span>Te contactamos para cerrar hora exacta y comprobar el acceso con foto o dirección.</span></div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- CONTACTO: formulario independiente para consultas generales. -->
 <section id="contacto">
   <div class="wrap">
     <div class="form-wrap">
@@ -358,22 +369,22 @@
         <h2>¿Dudas antes de pedir presupuesto?</h2>
         <p class="hero-sub">Escríbenos y te respondemos nosotros mismos, sin intermediarios.</p>
 
-        <!-- FORMULARIO DE CONTACTO — sustituye TU_ID_DE_FORMSPREE por tu ID real -->
+        <!-- Sustituir TU_ID_DE_FORMSPREE por el endpoint real del formulario de contacto. -->
         <form id="contactForm" action="https://formspree.io/f/TU_ID_DE_FORMSPREE" method="POST">
-          <input type="hidden" name="_subject" value="Nuevo mensaje de contacto — PLUMA47">
+          <input type="hidden" name="_subject" value="Nuevo mensaje de contacto - BHC">
           <div class="field-row">
             <div class="field">
               <label for="ctName">Nombre</label>
-              <input id="ctName" name="Nombre" type="text" required>
+              <input id="ctName" name="Nombre" type="text" autocomplete="name" required>
             </div>
             <div class="field">
               <label for="ctPhone">Teléfono</label>
-              <input id="ctPhone" name="Teléfono" type="tel">
+              <input id="ctPhone" name="Teléfono" type="tel" autocomplete="tel">
             </div>
           </div>
           <div class="field">
             <label for="ctEmail">Email</label>
-            <input id="ctEmail" name="Email" type="email" required>
+            <input id="ctEmail" name="Email" type="email" autocomplete="email" required>
           </div>
           <div class="field">
             <label for="ctMsg">Mensaje</label>
@@ -406,12 +417,13 @@
   </div>
 </section>
 
+<!-- PIE DE PÁGINA: navegación secundaria y datos de contacto. -->
 <footer>
   <div class="wrap">
     <div class="foot-grid">
       <div>
         <a href="#" class="brand">BHC</a>
-        <p style="color:var(--cement-dim); font-size:0.9rem; margin-top:14px; max-width:32ch;">Bombeo de hormigón para vivienda y obra en Valladolid. Pluma articulada, presupuesto claro y fecha reservada online.</p>
+        <p style="color:var(--cement-dim); font-size:0.9rem; margin-top:14px; max-width:32ch;">Bombeo de hormigón para vivienda y obra en Valladolid. Consulta disponibilidad y solicita fecha para tu obra.</p>
       </div>
       <div>
         <h4>Navegación</h4>
@@ -419,7 +431,7 @@
           <li><a href="#servicios">Servicios</a></li>
           <li><a href="#precios">Precios</a></li>
           <li><a href="#disponibilidad">Disponibilidad</a></li>
-          <li><a href="#reservar">Reservar</a></li>
+          <li><a href="#reservar">Solicitar fecha</a></li>
         </ul>
       </div>
       <div>
@@ -433,12 +445,12 @@
     </div>
     <div class="foot-bottom">
       <span>© <span id="year"></span> BHC · Bombeo de hormigón, Valladolid</span>
-      <span>CIF: B00000000 · Aviso legal · Política de privacidad</span>
+      <!-- PENDIENTE: incluir CIF real y enlaces a aviso legal y política de privacidad antes de publicar la web comercialmente. -->
     </div>
   </div>
 </footer>
 
 <div class="toast" id="toast"></div>
-<script src=" js/main.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>
